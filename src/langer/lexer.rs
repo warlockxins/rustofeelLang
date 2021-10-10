@@ -12,7 +12,7 @@ impl Lexer {
         Lexer {
             data: data,
             tokens: Vec::new(),
-            keywords: vec![String::from("echo"), String::from("stop")]
+            keywords: vec![String::from("echo"), String::from("stop"), String::from("goto")]
         }
     }
 
@@ -44,6 +44,10 @@ impl Lexer {
             else {
                 if l != '\n' {
                     tmp.push(l);
+                }
+                else if tmp.len() > 0 {
+                    self.tokens.push(Token { id: String::from("atom"), value: tmp.clone() });
+                    tmp.clear();
                 }
             }
 

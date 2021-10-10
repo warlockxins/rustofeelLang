@@ -1,63 +1,14 @@
 use super::token::Token;
-
-#[derive(Debug)]
-enum NodeValue {
-    Str(String),
-    List(Vec<AstNode>)
-}
-
-#[derive(Debug)]
-struct AstNode {
-    key: String,
-    value: NodeValue
-}
-
-impl AstNode {
-    pub fn new(key: String, node: NodeValue) -> AstNode {
-        AstNode { key: key, value: node }
-    }
-}
-/*
-type HashNode = HashMap<String, Vec<Node>>;
-#[derive(Debug)]
-enum Node {
-    StringMap(HashMap<String, String>),
-    HashMap(HashNode)
-}
-*/
-
-#[derive(Debug)]
-struct AST {
-    astn: Vec<AstNode>
-}
-
-impl AST {
-    pub fn new() -> AST {
-        AST {
-            astn: vec![]
-        }
-    }
-
-    fn addn(&mut self, node: AstNode) {
-        self.astn.push(node);
-    }
-
-    fn add_to(&mut self, parent: String, node: AstNode) {
-        if let Some(a) = self.astn.iter_mut().find(|i| i.key == parent ) {
-            if let NodeValue::List(l) = &mut a.value {
-                l.push(node);
-            }
-        }
-    }
-}
+use super::ast::{AST, AstNode, NodeValue};
 
 pub struct Parser {
     tokens: Vec<Token>,
+    pub ast: Option<AST>
 }
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Parser {
-        Parser { tokens: tokens }
+        Parser { tokens: tokens, ast: None }
     }
 
 
@@ -82,8 +33,8 @@ impl Parser {
 
             else if token.id == "keyword" {
                 if token.value == "stop" {
-                    println!("stop Feature");
-                    //ast.addn()
+                    let an = AstNode::new(token.value.clone(), NodeValue::Str(String::from("")));
+                    ast.add_to(parent.clone(), an);
                 }
                 else {
                     if collect == false {
@@ -91,26 +42,27 @@ impl Parser {
                         collect = true;
                      }
                     else {
-                        println!("kill me now {:?}", token);
                         collect = false;
                     }
                 }
             }
 
-            else if token.id == "char" {
+            else if token.id == "char" || token.id == "atom" {
+                if (token.id == "atom") {
+                    println!("atom parse {:?}", token.value);
+                }
                 if collect == false {
                     saved = Some(token);
                     collect = true;
                 }
                 else {
-                    println!("   stop collecting {:?}", saved);
-
                     match saved {
                         Some(v) => {
                             let an = AstNode::new(v.value.clone(), NodeValue::Str(token.value.clone()));
                             ast.add_to(parent.clone(), an);
                         },
                         None => {
+                            println!("had no saved")
                         }
                     }
                     collect = false;
@@ -119,6 +71,6 @@ impl Parser {
 
         }
 
-         println!("res {:?}", ast);
+        self.ast = Some(ast);
     }
 }

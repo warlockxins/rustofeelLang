@@ -1,0 +1,9 @@
+start:
+    echo "this is a test"
+    goto other_label
+    echo "we are back to main"
+    stop
+    echo "this should not show"
+other_label:
+    echo "Other label call"
+    echo "Other label call 2"
