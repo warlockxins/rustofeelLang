@@ -3,12 +3,13 @@ use langer::{ lexer::Lexer, parser::Parser, evaluator::Evaluator };
 use std::fs;
 
 fn main() {
-    let contents = fs::read_to_string("echo.rfeel")
-        .expect("Something went wrong reading the file");
+    let contents = String::from(
+        fs::read_to_string("echo.rfeel")
+        .expect("Something went wrong reading the file"));
 
     println!("With text:\n{}", contents);
 
-    let mut l = Lexer::new(String::from(contents));
+    let mut l = Lexer::new(contents);
     l.tokenizer();
 
     println!("Tokens :\n{:#?}\n", l.tokens);
